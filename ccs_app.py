@@ -1,12 +1,25 @@
 # Import Python Libraries
 import pandas as pd
-import numpy as np
 import streamlit as st
 import plotly.express as px
 from PIL import Image
 
 st.set_page_config(page_title="CCS America", page_icon="sources/icons/logo.png", layout="wide")
 logo = Image.open('sources/icons/logo.png')
+
+# CSS codes to improve the design of the web app
+st.markdown(
+    """
+<style>
+h1 {text-align: center;
+}
+body {background-color: #DCE3D5;
+      width: 1400px;
+      margin: 15px auto;
+}
+</style>""",
+    unsafe_allow_html=True,
+)
 
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:

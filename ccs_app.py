@@ -9,7 +9,7 @@ logo = "sources/icons/logo.png"
 
 st.markdown(
     """
-    <h1 style='text-align: center;'>🌎 CCS América </h1>
+    <h1 style='text-align: center;'>🌎 Americas CO₂ Removal </h1>
     """,
     unsafe_allow_html=True
 )

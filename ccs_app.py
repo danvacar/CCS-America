@@ -2,6 +2,7 @@
 import pandas as pd
 import streamlit as st
 import plotly.express as px
+# from streamlit_option_menu import option_menu
 from PIL import Image
 
 st.set_page_config(page_title="CCS America", page_icon="sources/icons/logo.png", layout="wide")
@@ -43,6 +44,14 @@ body {background-color: #DCE3D5;
 </style>""",
     unsafe_allow_html=True,
 )
+
+# # Add sections of the app
+# with st.sidebar:
+#     section = option_menu(menu_title="Menu", options=["📊 CO₂ Emissions Volume",
+#                                                       "🛢️ Geological Storage Capacity",
+#                                                       "🟢 Carbon balance and emission removal",
+#                                                       "🗺️ Mapa interactivo de reservorios"],
+#                           icons=["house", "database", "tv-fill", "calculator"])
 
 st.sidebar.title("📑 Section Menu")
 section = st.sidebar.radio(
@@ -309,7 +318,7 @@ elif section == "🛢️ Geological Storage Capacity":
 elif section == "🟢 Carbon balance and emission removal":
     st.subheader("🟢 Carbon balance and emission removal")
     st.markdown("""
-        Visualize the *carbon balance* and the *% of emission removal* at different levels:
+        Visualize the *carbon balance* and the *% of CO₂ emission removal* at different levels:
         - America
         - North America
         - South America

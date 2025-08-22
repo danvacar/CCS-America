@@ -44,7 +44,7 @@ body {background-color: #DCE3D5;
     unsafe_allow_html=True,
 )
 
-st.sidebar.title("📑 Menú de Navegación")
+st.sidebar.title("📑 Section Menu")
 section = st.sidebar.radio(
     "Ir a:",
     ["📊 CO₂ Emissions Volume",

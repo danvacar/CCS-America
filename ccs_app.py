@@ -4,6 +4,7 @@ import streamlit as st
 import folium
 from streamlit_folium import folium_static
 import plotly.express as px
+from pathlib import Path
 # from streamlit_option_menu import option_menu
 from PIL import Image
 
@@ -63,7 +64,7 @@ section = st.sidebar.radio(
      "🟢 Carbon balance and emission removal",
      "🗺️ Reservoirs Location"])
 
-data = "data/co2-by-source.csv"
+data = Path("data/co2-by-source.csv")
 
 if section == "📊 CO₂ Emissions Volume":
     st.subheader("📊 CO₂ Emissions Volume")
@@ -343,7 +344,7 @@ elif section == "🟢 Carbon balance and emission removal":
     with st.expander("🌎 Total balance - America"):
         df_balance_ext = df_balance.copy()
 
-        df_emissions = pd.read_csv("data/co2-by-source.csv")
+        df_emissions = pd.read_csv(data)
         df_emissions = df_emissions.melt(
             id_vars=["Entity", "Year"],
             value_vars=["Coal", "Oil", "Gas", "Flaring", "Cement"],
@@ -439,7 +440,7 @@ elif section == "🟢 Carbon balance and emission removal":
     with st.expander("🟢 Balance - South America"):
         df_sa = df_balance[df_balance["Region"] == "South America"].copy()
 
-        df_emissions = pd.read_csv("data/co2-by-source.csv")
+        df_emissions = pd.read_csv(data)
 
         df_emissions = df_emissions.melt(
             id_vars=["Entity", "Year"],

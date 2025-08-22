@@ -1,6 +1,8 @@
 # Import Python Libraries
 import pandas as pd
 import streamlit as st
+import folium
+from streamlit_folium import folium_static
 import plotly.express as px
 # from streamlit_option_menu import option_menu
 from PIL import Image
@@ -59,7 +61,7 @@ section = st.sidebar.radio(
     ["📊 CO₂ Emissions Volume",
      "🛢️ Geological Storage Capacity",
      "🟢 Carbon balance and emission removal",
-     "🗺️ Mapa interactivo de reservorios"])
+     "🗺️ Reservoirs Location"])
 
 if section == "📊 CO₂ Emissions Volume":
     st.subheader("📊 CO₂ Emissions Volume")
@@ -505,3 +507,24 @@ elif section == "🟢 Carbon balance and emission removal":
                                   legend=dict(orientation="h", y=-0.2, x=0.5, xanchor="center"))
         fig_country.update_yaxes(title_text="Total emissions (Mt)", tickformat=".0f")
         st.plotly_chart(fig_country, use_container_width=True)
+
+elif section == "🗺️ Reservoirs Location":
+    # Load the coordinates of the countries where the EOR projects of this dataset are
+    coordinates = {
+        "Clive": ([52.42931464961698, -113.41669788869072], 5),
+        "Weyburn": ([49.66753769, -103.85824585], 38),
+        "Chigwell": ([52.632, -113.581], 140),
+        "Redwater": ([53.953056, -113.110794], 8),
+        "Joffre": ([52.336111, -113.537222], 1),
+        "Pembina": ([53.062, -114891], 1),
+        "Quest": ([53.797248, -113.092769], 10),
+        "Aquistore": ([49.096207, -103.033997], 1)
+    }
+    # Load the world map
+    m = folium.Map(zoom_start=14)
+    # Load the markers and popups
+    for reservoir, point in coordinates.items():
+        folium.Marker(
+            point[0], popup="<b>{}: </b> {} EOR Projects".format(reservoir, point[1])
+        ).add_to(m)
+    folium_static(m)

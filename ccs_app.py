@@ -63,6 +63,8 @@ section = st.sidebar.radio(
      "🟢 Carbon balance and emission removal",
      "🗺️ Reservoirs Location"])
 
+data = "data/co2-by-source.csv"
+
 if section == "📊 CO₂ Emissions Volume":
     st.subheader("📊 CO₂ Emissions Volume")
     st.markdown("""
@@ -71,7 +73,7 @@ if section == "📊 CO₂ Emissions Volume":
     and year range.
     """)
 
-    df_emisiones = pd.read_csv("data/co2-by-source.csv")
+    df_emisiones = pd.read_csv(data)
     df_emisiones = df_emisiones.melt(
         id_vars=["Entity", "Year"],
         value_vars=["Coal", "Oil", "Gas", "Flaring", "Cement"],

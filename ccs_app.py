@@ -64,7 +64,8 @@ section = st.sidebar.radio(
      "🟢 Carbon balance and emission removal",
      "🗺️ Reservoirs Location"])
 
-data = Path("data/co2-by-source.csv")
+APP_DIR = Path(__file__).resolve().parent
+data = APP_DIR / "Data" /"co2-by-source.csv"
 
 if section == "📊 CO₂ Emissions Volume":
     st.subheader("📊 CO₂ Emissions Volume")

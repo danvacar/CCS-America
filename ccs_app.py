@@ -5,7 +5,7 @@ import folium
 from streamlit_folium import folium_static
 import plotly.express as px
 from pathlib import Path
-# from streamlit_option_menu import option_menu
+from streamlit_option_menu import option_menu
 from PIL import Image
 
 st.set_page_config(page_title="CCS America", page_icon="sources/icons/logo.png", layout="wide")
@@ -18,13 +18,11 @@ st.markdown(
     unsafe_allow_html=True
 )
 st.markdown("---")
-
 st.markdown(
     """
     <style>
     h1 {text-align: center;
     }
-
     .stApp {background-color: #DCE3D5;
             width: 1400px;
             margin: 15px auto;
@@ -48,26 +46,27 @@ body {background-color: #DCE3D5;
     unsafe_allow_html=True,
 )
 
-# # Add sections of the app
-# with st.sidebar:
-#     section = option_menu(menu_title="Menu", options=["📊 CO₂ Emissions Volume",
-#                                                       "🛢️ Geological Storage Capacity",
-#                                                       "🟢 Carbon balance and emission removal",
-#                                                       "🗺️ Mapa interactivo de reservorios"],
-#                           icons=["house", "database", "tv-fill", "calculator"])
+# Add sections of the app
+with st.sidebar:
+     section = option_menu(menu_title="Section Menu", options=["Home",
+                                                               "CO₂ Emissions Volume",
+                                                               "Geological Storage Capacity",
+                                                               "Carbon balance and emission removal",
+                                                               "Reservoirs Location"],
+                           icons=["house", "graph-up", "database", "tree", "pin-map"])
 
-st.sidebar.title("📑 Section Menu")
-section = st.sidebar.radio(
-    "Ir a:",
-    ["📊 CO₂ Emissions Volume",
-     "🛢️ Geological Storage Capacity",
-     "🟢 Carbon balance and emission removal",
-     "🗺️ Reservoirs Location"])
+#st.sidebar.title("📑 Section Menu")
+#section = st.sidebar.radio(
+#    "Ir a:",
+#    ["📊 CO₂ Emissions Volume",
+#     "🛢️ Geological Storage Capacity",
+#     "🟢 Carbon balance and emission removal",
+#     "🗺️ Reservoirs Location"])
 
 APP_DIR = Path(__file__).resolve().parent
 data = APP_DIR / "Data" /"co2-by-source.csv"
 
-if section == "📊 CO₂ Emissions Volume":
+if section == "CO₂ Emissions Volume":
     st.subheader("📊 CO₂ Emissions Volume")
     st.markdown("""
     Here you can explore the **total emissions volume** by country or region 
@@ -195,11 +194,12 @@ if section == "📊 CO₂ Emissions Volume":
         st.dataframe(df_region.style.set_properties(**{'text-align': 'center'}), use_container_width=True)
         st.metric(label=f"Total emissions of {region} ({source})", value=f"{round(total_region, 2)} Mt CO₂")
 
-elif section == "🛢️ Geological Storage Capacity":
+elif section == "Geological Storage Capacity":
     st.subheader("🛢️ Geological Storage Capacity")
     st.markdown("""
     Here you can explore the **CO₂ geological storage capacity**.  
-    First, select a **region**, then one or more **countries** from that region, and finally the **reservoirs**.
+    First, select a **region**, then one or more **countries** from that region.  
+    If you select **America**, you will only see the total storage capacity per country.  
     """)
 
     df_reservoirs = pd.DataFrame({
@@ -278,48 +278,70 @@ elif section == "🛢️ Geological Storage Capacity":
         ]
     })
 
-    region = st.selectbox("🌎 Select region:", df_reservoirs["Region"].unique())
-    df_region = df_reservoirs[df_reservoirs["Region"] == region]
+    region_options = list(df_reservoirs["Region"].unique()) + ["America"]
+    region = st.selectbox("🌎 Select region:", region_options)
+
+    if region == "America":
+        df_region = df_reservoirs.copy()
+    else:
+        df_region = df_reservoirs[df_reservoirs["Region"] == region]
+
     countries = st.multiselect("🏳️ Select country/countries:", df_region["Country"].unique())
 
     if countries:
         df_countries = df_region[df_region["Country"].isin(countries)]
-        df_countries["Reservoir_Display"] = df_countries["Country"] + " - " + df_countries["Reservoir"]
-        selected_display_reservoirs = st.multiselect(
-            "🛢️ Select reservoir(s):",
-            df_countries["Reservoir_Display"].unique()
-        )
 
-        if selected_display_reservoirs:
-            df_selected = df_countries[df_countries["Reservoir_Display"].isin(selected_display_reservoirs)]
-            st.subheader("🛢️ Selected Reservoir Data")
-            st.dataframe(
-                df_selected[
-                    ["Region", "Country", "Reservoir", "Capacity (Mt)", "Depth (m)", "Thickness (m)", "Porosity (%)",
-                     "Permeability (mD)"]]
-                .style.format({
-                    "Capacity (Mt)": "{:.2f}",
-                    "Depth (m)": "{:.2f}",
-                    "Thickness (m)": "{:.2f}",
-                    "Porosity (%)": "{:.2f}",
-                    "Permeability (mD)": "{:.2f}"
-                }).set_properties(**{'text-align': 'center'}),
-                use_container_width=True
+        if region == "America":
+            df_country_total = df_countries.groupby("Country", as_index=False)["Capacity (Mt)"].sum()
+
+            st.subheader("🏳️ Total Capacity by Country")
+            st.dataframe(df_country_total.style.format({"Capacity (Mt)": "{:.2f}"}), use_container_width=True)
+
+            fig_country = px.bar(df_country_total, x="Country", y="Capacity (Mt)",
+                                 color="Country", text="Capacity (Mt)",
+                                 title="📊 Total Capacity per Country in America")
+            st.plotly_chart(fig_country, use_container_width=True)
+
+            st.metric(label="Total capacity (selected countries)",
+                      value=f"{df_country_total['Capacity (Mt)'].sum():.2f} Mt CO₂")
+
+        else:
+            df_countries["Reservoir_Display"] = df_countries["Country"] + " - " + df_countries["Reservoir"]
+            selected_display_reservoirs = st.multiselect(
+                "🛢️ Select reservoir(s):",
+                df_countries["Reservoir_Display"].unique()
             )
 
-            if len(selected_display_reservoirs) == 1:
-                st.metric(label="Selected reservoir capacity",
-                          value=f"{df_selected['Capacity (Mt)'].values[0]:.2f} Mt CO₂")
+            if selected_display_reservoirs:
+                df_selected = df_countries[df_countries["Reservoir_Display"].isin(selected_display_reservoirs)]
+                st.subheader("🛢️ Selected Reservoir Data")
+                st.dataframe(
+                    df_selected[
+                        ["Region", "Country", "Reservoir", "Capacity (Mt)", "Depth (m)", "Thickness (m)", "Porosity (%)",
+                         "Permeability (mD)"]]
+                    .style.format({
+                        "Capacity (Mt)": "{:.2f}",
+                        "Depth (m)": "{:.2f}",
+                        "Thickness (m)": "{:.2f}",
+                        "Porosity (%)": "{:.2f}",
+                        "Permeability (mD)": "{:.2f}"
+                    }).set_properties(**{'text-align': 'center'}),
+                    use_container_width=True
+                )
 
-            st.metric(label="Total capacity of selected reservoir(s)",
-                      value=f"{df_selected['Capacity (Mt)'].sum():.2f} Mt CO₂")
-            st.metric(label=f"Total capacity in {region}",
-                      value=f"{df_region['Capacity (Mt)'].sum():.2f} Mt CO₂")
+                if len(selected_display_reservoirs) == 1:
+                    st.metric(label="Selected reservoir capacity",
+                              value=f"{df_selected['Capacity (Mt)'].values[0]:.2f} Mt CO₂")
 
-            fig = px.bar(df_selected, x="Reservoir", y="Capacity (Mt)",
-                         color="Country", text="Capacity (Mt)",
-                         title=f"📊 Capacity per selected reservoir(s)")
-            st.plotly_chart(fig, use_container_width=True)
+                st.metric(label="Total capacity of selected reservoir(s)",
+                          value=f"{df_selected['Capacity (Mt)'].sum():.2f} Mt CO₂")
+                st.metric(label=f"Total capacity in {region}",
+                          value=f"{df_region['Capacity (Mt)'].sum():.2f} Mt CO₂")
+
+                fig = px.bar(df_selected, x="Reservoir", y="Capacity (Mt)",
+                             color="Country", text="Capacity (Mt)",
+                             title=f"📊 Capacity per selected reservoir(s)")
+                st.plotly_chart(fig, use_container_width=True)
 
 elif section == "🟢 Carbon balance and emission removal":
     st.subheader("🟢 Carbon balance and emission removal")

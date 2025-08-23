@@ -6,7 +6,8 @@ from streamlit_folium import folium_static
 import plotly.express as px
 from pathlib import Path
 from streamlit_option_menu import option_menu
-from PIL import Image
+import plotly.graph_objects as go
+#from PIL import Image
 
 st.set_page_config(page_title="CCS America", page_icon="sources/icons/logo.png", layout="wide")
 logo = "sources/icons/logo.png"
@@ -198,7 +199,7 @@ elif section == "Geological Storage Capacity":
     st.subheader("🛢️ Geological Storage Capacity")
     st.markdown("""
     Here you can explore the **CO₂ geological storage capacity**.  
-    First, select a **region**, then one or more **countries** from that region.  
+    First, select a **Region**, then one or more **countries** from that region.  
     If you select **America**, you will only see the total storage capacity per country.  
     """)
 
@@ -292,7 +293,7 @@ elif section == "Geological Storage Capacity":
         df_countries = df_region[df_region["Country"].isin(countries)]
 
         if region == "America":
-            df_country_total = df_countries.groupby("Country", as_index=False)["Capacity (Mt)"].sum()
+            df_country_total = df_countries.groupby("Country", as_index=False)["Capacity (Mt)"].sum().round(2)
 
             st.subheader("🏳️ Total Capacity by Country")
             st.dataframe(df_country_total.style.format({"Capacity (Mt)": "{:.2f}"}), use_container_width=True)
@@ -343,14 +344,10 @@ elif section == "Geological Storage Capacity":
                              title=f"📊 Capacity per selected reservoir(s)")
                 st.plotly_chart(fig, use_container_width=True)
 
-elif section == "🟢 Carbon balance and emission removal":
+elif section == "Carbon balance and emission removal":
     st.subheader("🟢 Carbon balance and emission removal")
     st.markdown("""
         Visualize the *carbon balance* and the *% of CO₂ emission removal* at different levels:
-        - America
-        - North America
-        - South America
-        - Country
     """)
 
     df_balance = pd.DataFrame({
@@ -364,6 +361,7 @@ elif section == "🟢 Carbon balance and emission removal":
     df_balance["CO₂ not stored (Mt)"] = df_balance["CO₂ emissions (Mt)"] - df_balance["CO₂ stored (Mt)"]
     df_balance["% Removal"] = (df_balance["CO₂ stored (Mt)"] / df_balance["CO₂ emissions (Mt)"] * 100).round(2)
 
+    # --- Total America ---
     with st.expander("🌎 Total balance - America"):
         df_balance_ext = df_balance.copy()
 
@@ -424,47 +422,105 @@ elif section == "🟢 Carbon balance and emission removal":
             }).set_properties(**{'text-align': 'center'})
         )
 
-        fig = px.bar(
-            df_america,
-            x="Region",
-            y=["CO₂ stored (Mt)", "CO₂ not stored (Mt)"],
-            text_auto=True,
-            labels={"value": "Total emissions (Mt)", "variable": ""}
+        fig = go.Figure()
+
+        fig.add_bar(
+            x=df_america["Region"],
+            y=df_america["CO₂ not stored (Mt)"],
+            name="CO₂ not removed",
+            marker_color="silver",
+            hovertemplate="Not removed: %{y:.2f} Mt"
         )
+
+        fig.add_bar(
+            x=df_america["Region"],
+            y=df_america["CO₂ stored (Mt)"],
+            name="CO₂ removed",
+            marker_color="#6AA84F",
+            hovertemplate="Removed: %{y:.2f} Mt<br>% Removal: %{customdata:.2f}%",
+            customdata=df_america["% Removal"]
+        )
+
+        for i, row in df_america.iterrows():
+            fig.add_annotation(
+                x=row["Region"],
+                y=row["CO₂ emissions (Mt)"],
+                text=f"{row['% Removal']:.1f}%",
+                showarrow=False,
+                yshift=10
+            )
 
         fig.update_layout(
-            title_text="Emission balance in America",
-            title_x=0.5,
-            barmode='stack',
-            yaxis_title="Total emissions (Mt)",
-            legend=dict(orientation="h", y=-0.2, x=0.5, xanchor="center")
+            title="Emission balance in America",
+            barmode="stack",
+            yaxis_title="Total emissions (Mt CO₂)",
+            legend=dict(orientation="h", y=-0.2, x=0.5, xanchor="center"),
+            title_x=0.5
         )
+
         st.plotly_chart(fig, use_container_width=True)
 
+    # --- North America ---
     with st.expander("🟢 Balance - North America"):
         df_na = df_balance[df_balance["Region"] == "North America"].copy()
-        st.dataframe(df_na[["Country", "CO₂ emissions (Mt)", "CO₂ stored (Mt)", "CO₂ not stored (Mt)", "% Removal"]]
-                     .style.format(
-            {"CO₂ emissions (Mt)": "{:.2f}", "CO₂ stored (Mt)": "{:.2f}", "CO₂ not stored (Mt)": "{:.2f}",
-             "% Removal": "{:.2f}%"}).set_properties(**{'text-align': 'center'}))
+
+        st.dataframe(
+            df_na[["Country", "CO₂ emissions (Mt)", "CO₂ stored (Mt)", "CO₂ not stored (Mt)", "% Removal"]]
+            .style.format({
+                "CO₂ emissions (Mt)": "{:.2f}",
+                "CO₂ stored (Mt)": "{:.2f}",
+                "CO₂ not stored (Mt)": "{:.2f}",
+                "% Removal": "{:.2f}%"
+            }).set_properties(**{'text-align': 'center'})
+        )
 
         st.metric("Total % removal North America",
                   f"{(df_na['CO₂ stored (Mt)'].sum() / df_na['CO₂ emissions (Mt)'].sum() * 100):.2f}%")
         st.metric("Total CO₂ stored", f"{df_na['CO₂ stored (Mt)'].sum():.2f} Mt CO₂")
 
-        fig = px.bar(df_na, x="Country", y=["CO₂ stored (Mt)", "CO₂ not stored (Mt)"],
-                     text_auto=True, labels={"value": "Total emissions (Mt)", "variable": ""})
-        fig.update_layout(title_text="Emission balance by country in North America", title_x=0.5,
-                          yaxis_title="Total emissions (Mt)",
-                          barmode='stack',
-                          legend=dict(orientation="h", y=-0.2, x=0.5, xanchor="center"))
+        fig = go.Figure()
+
+        fig.add_bar(
+            x=df_na["Country"],
+            y=df_na["CO₂ not stored (Mt)"],
+            name="CO₂ not removed",
+            marker_color="silver",
+            hovertemplate="Not removed: %{y:.2f} Mt"
+        )
+
+        fig.add_bar(
+            x=df_na["Country"],
+            y=df_na["CO₂ stored (Mt)"],
+            name="CO₂ removed",
+            marker_color="#6AA84F",
+            hovertemplate="Removed: %{y:.2f} Mt<br>% Removal: %{customdata:.2f}%",
+            customdata=df_na["% Removal"]
+        )
+
+        for i, row in df_na.iterrows():
+            fig.add_annotation(
+                x=row["Country"],
+                y=row["CO₂ emissions (Mt)"],
+                text=f"{row['% Removal']:.1f}%",
+                showarrow=False,
+                yshift=10
+            )
+
+        fig.update_layout(
+            title="Emission balance by country in North America",
+            barmode="stack",
+            yaxis_title="Total emissions (Mt CO₂)",
+            legend=dict(orientation="h", y=-0.2, x=0.5, xanchor="center"),
+            title_x=0.5
+        )
+
         st.plotly_chart(fig, use_container_width=True)
 
+    # --- South America ---
     with st.expander("🟢 Balance - South America"):
         df_sa = df_balance[df_balance["Region"] == "South America"].copy()
 
         df_emissions = pd.read_csv(data)
-
         df_emissions = df_emissions.melt(
             id_vars=["Entity", "Year"],
             value_vars=["Coal", "Oil", "Gas", "Flaring", "Cement"],
@@ -505,36 +561,113 @@ elif section == "🟢 Carbon balance and emission removal":
                   f"{(df_sa['CO₂ stored (Mt)'].fillna(0).sum() / df_sa['CO₂ emissions (Mt)'].sum() * 100):.2f}%")
         st.metric("Total CO₂ stored", f"{df_sa['CO₂ stored (Mt)'].fillna(0).sum():.2f} Mt CO₂")
 
-        fig = px.bar(df_sa, x="Country", y=["CO₂ stored (Mt)", "CO₂ not stored (Mt)"],
-                     text_auto=True, labels={"value": "Total emissions (Mt)", "variable": "Type"})
-        fig.update_layout(title_text="Emission balance by country in South America", title_x=0.5,
-                          yaxis_title="Total emissions (Mt)",
-                          barmode='stack',
-                          legend=dict(orientation="h", y=-0.2, x=0.5, xanchor="center"))
+        df_sa_plot = df_sa[~df_sa["Country"].isin(["Argentina", "Venezuela"])]
+
+        fig = go.Figure()
+
+        fig.add_bar(
+            x=df_sa_plot["Country"],
+            y=df_sa_plot["CO₂ not stored (Mt)"],
+            name="CO₂ not removed",
+            marker_color="silver",
+            hovertemplate="Not removed: %{y:.2f} Mt"
+        )
+
+        fig.add_bar(
+            x=df_sa_plot["Country"],
+            y=df_sa_plot["CO₂ stored (Mt)"],
+            name="CO₂ removed",
+            marker_color="#6AA84F",
+            hovertemplate="Removed: %{y:.2f} Mt<br>% Removal: %{customdata:.2f}%",
+            customdata=df_sa_plot["% Removal"]
+        )
+
+        for i, row in df_sa_plot.iterrows():
+            fig.add_annotation(
+                x=row["Country"],
+                y=row["CO₂ emissions (Mt)"],
+                text=f"{row['% Removal']:.1f}%",
+                showarrow=False,
+                yshift=10
+            )
+
+        fig.update_layout(
+            title="Emission balance by country in South America",
+            barmode="stack",
+            yaxis_title="Total emissions (Mt CO₂)",
+            legend=dict(orientation="h", y=-0.2, x=0.5, xanchor="center"),
+            title_x=0.5
+        )
+
         st.plotly_chart(fig, use_container_width=True)
 
+    # --- Country selector ---
     with st.expander("🌍 Balance - Country"):
-        selected_countries = st.multiselect("Select countries:", df_balance["Country"].unique())
+        selected_countries = st.multiselect(
+            "Select countries:",
+            df_balance["Country"].unique()
+        )
+
         df_selected = df_balance[df_balance["Country"].isin(selected_countries)].copy()
-        df_selected["% Removal"] = (df_selected["CO₂ stored (Mt)"] / df_selected["CO₂ emissions (Mt)"] * 100).round(2)
+        df_selected = df_selected[~df_selected["Country"].str.contains("Total", case=False, na=False)]
+
+        df_selected["% Removal"] = (
+                (df_selected["CO₂ stored (Mt)"] / df_selected["CO₂ emissions (Mt)"]) * 100
+        ).round(2)
+
+        df_selected = df_selected.rename(columns={"CO₂ stored (Mt)": "CO₂ Removed (Mt)"})
 
         st.dataframe(
-            df_selected[["Country", "CO₂ emissions (Mt)", "CO₂ stored (Mt)", "% Removal"]]
+            df_selected[["Country", "CO₂ emissions (Mt)", "CO₂ Removed (Mt)", "% Removal"]]
             .style.format(
-                {"CO₂ emissions (Mt)": "{:.2f}", "CO₂ stored (Mt)": "{:.2f}", "% Removal": "{:.2f}%"}).set_properties(
-                **{'text-align': 'center'}),
+                {
+                    "CO₂ emissions (Mt)": "{:.2f}",
+                    "CO₂ Removed (Mt)": "{:.2f}",
+                    "% Removal": "{:.2f}%"
+                }
+            ).set_properties(**{'text-align': 'center'}),
             use_container_width=True
         )
 
-        fig_country = px.bar(df_selected, x="Country", y=["CO₂ emissions (Mt)", "CO₂ stored (Mt)"],
-                             text_auto=True, labels={"value": "Total emissions (Mt)", "variable": ""},
-                             title="Emission balance by country")
-        fig_country.update_layout(title_x=0.5, barmode='stack',
-                                  legend=dict(orientation="h", y=-0.2, x=0.5, xanchor="center"))
-        fig_country.update_yaxes(title_text="Total emissions (Mt)", tickformat=".0f")
-        st.plotly_chart(fig_country, use_container_width=True)
+        fig = go.Figure()
 
-elif section == "🗺️ Reservoirs Location":
+        fig.add_bar(
+            x=df_selected["Country"],
+            y=df_selected["CO₂ emissions (Mt)"] - df_selected["CO₂ Removed (Mt)"],
+            name="CO₂ not removed",
+            marker_color="silver",
+            hovertemplate="Not removed: %{y:.2f} Mt"
+        )
+
+        fig.add_bar(
+            x=df_selected["Country"],
+            y=df_selected["CO₂ Removed (Mt)"],
+            name="CO₂ removed",
+            marker_color="#6AA84F",
+            hovertemplate="Removed: %{y:.2f} Mt<br>% Removal: %{customdata:.2f}%",
+            customdata=df_selected["% Removal"]
+        )
+
+        for i, row in df_selected.iterrows():
+            fig.add_annotation(
+                x=row["Country"],
+                y=row["CO₂ emissions (Mt)"],
+                text=f"{row['% Removal']:.1f}%",
+                showarrow=False,
+                yshift=10
+            )
+
+        fig.update_layout(
+            title="Emission balance by selected countries",
+            barmode="stack",
+            yaxis_title="Total emissions (Mt CO₂)",
+            legend=dict(orientation="h", y=-0.2, x=0.5, xanchor="center"),
+            title_x=0.5
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
+elif section == "Reservoirs Location":
     # Load the coordinates of the countries where the EOR projects of this dataset are
     coordinates = {
         "Clive": ([52.42931464961698, -113.41669788869072], 5),
@@ -542,7 +675,7 @@ elif section == "🗺️ Reservoirs Location":
         "Chigwell": ([52.632, -113.581], 140),
         "Redwater": ([53.953056, -113.110794], 8),
         "Joffre": ([52.336111, -113.537222], 1),
-        "Pembina": ([53.062, -114891], 1),
+        "Pembina": ([53.062, -114.891], 1),
         "Quest": ([53.797248, -113.092769], 10),
         "Aquistore": ([49.096207, -103.033997], 1)
     }

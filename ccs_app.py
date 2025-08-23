@@ -75,6 +75,7 @@ if section == "CO₂ Emissions Volume":
     and year range.
     """)
 
+    # --- Load and prepare data ---
     df_emisiones = pd.read_csv(data)
     df_emisiones = df_emisiones.melt(
         id_vars=["Entity", "Year"],
@@ -82,118 +83,142 @@ if section == "CO₂ Emissions Volume":
         var_name="Source",
         value_name="Emissions"
     )
-
+    # Convert to millions and renombrar columnas
     df_emisiones["Emissions"] = df_emisiones["Emissions"] / 1e6
-    df_emisiones = df_emisiones.rename(columns={"Emissions": "Emissions (Mt)"})
+    df_emisiones = df_emisiones.rename(columns={"Entity": "Country", "Emissions": "Emissions (Mt)"})
 
-    # Filters
-    mode = st.radio("View emissions by:", ["Country", "Region"])
-    sources = list(df_emisiones["Source"].unique()) + ["All"]
-    source = st.selectbox("Select emission source:", sources)
+    # Eliminar filas sin año
+    df_emisiones = df_emisiones.dropna(subset=["Year"])
+    df_emisiones["Year"] = df_emisiones["Year"].astype(int)
 
-    year_min = int(df_emisiones["Year"].min())
-    year_max = int(df_emisiones["Year"].max())
-    years = st.slider("Select year range:", year_min, year_max, (year_min, year_max))
+    regions = {
+        "America": ["United States", "Canada", "Mexico", "Argentina", "Brazil", "Colombia", "Venezuela", "Ecuador"],
+        "North America": ["United States", "Canada", "Mexico"],
+        "South America": ["Argentina", "Brazil", "Colombia", "Venezuela", "Ecuador"]
+    }
 
-    if mode == "Country":
-        st.markdown("### 🌎 Emissions by Country")
+    # --- Table View ---
+    st.markdown("### Table View")
+    mode_table = st.radio("View table by:", ["Country", "Region"])
+    sources_table = list(df_emisiones["Source"].unique()) + ["All"]
+    source_table = st.selectbox("Select emission source:", sources_table, key="table_source")
 
-        countries = df_emisiones["Entity"].dropna().unique()
-        country = st.selectbox("Select country:", sorted(countries))
+    year_min_table = int(df_emisiones["Year"].min())
+    year_max_table = int(df_emisiones["Year"].max())
+    years_table = st.slider("Select year range:", year_min_table, year_max_table, (year_min_table, year_max_table), key="table_years")
 
+    if mode_table == "Country":
+        countries_table = df_emisiones["Country"].dropna().unique()
+        country_table = st.selectbox("Select country:", sorted(countries_table), key="table_country")
         df_filtered = df_emisiones[
-            (df_emisiones["Entity"] == country) &
-            (df_emisiones["Year"] >= years[0]) &
-            (df_emisiones["Year"] <= years[1])
-            ]
-
-        if source == "All":
-            df_filtered = df_filtered.groupby(["Entity", "Year"], as_index=False)["Emissions (Mt)"].sum()
+            (df_emisiones["Country"] == country_table) &
+            (df_emisiones["Year"] >= years_table[0]) &
+            (df_emisiones["Year"] <= years_table[1])
+        ]
+        if source_table == "All":
+            df_filtered = df_filtered.groupby(["Country", "Year"], as_index=False)["Emissions (Mt)"].sum()
             df_filtered["Source"] = "All"
-            df_filtered = df_filtered[["Entity", "Year", "Source", "Emissions (Mt)"]]
         else:
-            df_filtered = df_filtered[df_filtered["Source"] == source]
-            df_filtered = df_filtered[["Entity", "Year", "Source", "Emissions (Mt)"]]
+            df_filtered = df_filtered[df_filtered["Source"] == source_table]
 
-        df_filtered["Year"] = df_filtered["Year"].astype(int)
         total_country = df_filtered["Emissions (Mt)"].sum()
-        st.subheader(f"Emissions of {country} ({source}) between {years[0]} and {years[1]}")
+        st.dataframe(df_filtered.style.set_properties(**{'text-align': 'center'}), use_container_width=True)
+        st.metric(label=f"Total emissions of {country_table} ({source_table})", value=f"{round(total_country, 2)} Mt CO₂")
 
-        st.dataframe(
-            df_filtered.style.set_properties(**{'text-align': 'center'}), use_container_width=True)
-
-        st.metric(
-            label=f"Total emissions of {country} ({source})", value=f"{round(total_country, 2)} Mt CO₂")
-
-    elif mode == "Region":
-        st.markdown("### 🌎 Emissions by Region")
-        regions = {
-            "America": [
-                "United States", "Canada", "Mexico",  # North America
-                "Argentina", "Brazil", "Colombia", "Venezuela", "Ecuador"  # South America
-            ],
-            "North America": ["United States", "Canada", "Mexico"],
-            "South America": ["Argentina", "Brazil", "Colombia", "Venezuela", "Ecuador"]
-        }
-        region = st.selectbox("Select region:", list(regions.keys()))
-
-        df_region = df_emisiones[
-            (df_emisiones["Entity"].isin(regions[region])) &
-            (df_emisiones["Year"] >= years[0]) &
-            (df_emisiones["Year"] <= years[1])
-            ]
-
-        if source == "All":
-            df_region = df_region.groupby(["Year"], as_index=False)["Emissions (Mt)"].sum()
-            df_region["Source"] = "All"
+    elif mode_table == "Region":
+        region_table = st.selectbox("Select region:", list(regions.keys()), key="table_region")
+        df_filtered = df_emisiones[
+            (df_emisiones["Country"].isin(regions[region_table])) &
+            (df_emisiones["Year"] >= years_table[0]) &
+            (df_emisiones["Year"] <= years_table[1])
+        ]
+        if source_table == "All":
+            df_filtered = df_filtered.groupby(["Year"], as_index=False)["Emissions (Mt)"].sum()
+            df_filtered["Source"] = "All"
         else:
-            df_region = df_region[df_region["Source"] == source]
-            df_region = df_region.groupby(["Year"], as_index=False)["Emissions (Mt)"].sum()
-            df_region["Source"] = source
+            df_filtered = df_filtered[df_filtered["Source"] == source_table]
+            df_filtered = df_filtered.groupby(["Year", "Source"], as_index=False)["Emissions (Mt)"].sum()
 
-        df_region = df_region[["Source", "Year", "Emissions (Mt)"]]
-        df_region["Year"] = df_region["Year"].astype(int)
+        total_region = df_filtered["Emissions (Mt)"].sum()
+        st.dataframe(df_filtered.style.set_properties(**{'text-align': 'center'}), use_container_width=True)
+        st.metric(label=f"Total emissions of {region_table} ({source_table})", value=f"{round(total_region, 2)} Mt CO₂")
 
-        total_region = df_region["Emissions (Mt)"].sum()
+    # --- Chart View ---
+    st.markdown("### 📈 Visualize Emissions")
+    chart_type = st.selectbox("Select chart type:", ["Line Chart", "Bar Chart"], key="chart_type")
+    mode_chart = st.radio("View chart by:", ["Country", "Region"], key="chart_mode")
+    sources_chart = st.multiselect(
+        "Select emission sources to display:",
+        options=list(df_emisiones["Source"].unique()),
+        default=list(df_emisiones["Source"].unique()),
+        key="chart_sources"
+    )
+    year_min_chart = int(df_emisiones["Year"].min())
+    year_max_chart = int(df_emisiones["Year"].max())
+    years_chart = st.slider("Select year range for chart:", year_min_chart, year_max_chart, (year_min_chart, year_max_chart), key="chart_years")
 
-        st.subheader(f"Emissions of {region} ({source}) between {years[0]} and {years[1]}")
-        st.dataframe(df_region.style.set_properties(**{'text-align': 'center'}), use_container_width=True)
-        st.metric(label=f"Total emissions of {region} ({source})", value=f"{round(total_region, 2)} Mt CO₂")
+    # X-axis selection
+    x_axis_options = ["Year"]
+    if mode_chart in ["Country", "Region"]:
+        x_axis_options.append("Country")
+    x_axis = st.selectbox("Select X-axis:", x_axis_options, key="chart_x_axis")
 
-    elif mode == "Region":
-        st.markdown("### 🌎 Emissions by Region")
-        regions = {
-            "America": [
-                "United States", "Canada", "Mexico",  # North America
-                "Argentina", "Brazil", "Colombia", "Venezuela", "Ecuador"  # South America
-            ],
-            "North America": ["United States", "Canada", "Mexico"],
-            "South America": ["Argentina", "Brazil", "Colombia", "Venezuela", "Ecuador"]
-        }
-        region = st.selectbox("Select region:", list(regions.keys()))
+    # Filter data for chart
+    df_chart = df_emisiones[df_emisiones["Source"].isin(sources_chart)]
+    df_chart = df_chart[(df_chart["Year"] >= years_chart[0]) & (df_emisiones["Year"] <= years_chart[1])]
 
-        df_region = df_emisiones[
-            (df_emisiones["Entity"].isin(regions[region])) &
-            (df_emisiones["Year"] >= years[0]) &
-            (df_emisiones["Year"] <= years[1])
-            ]
+    # Apply mode filters
+    if mode_chart == "Country":
+        if x_axis == "Year":
+            countries_chart = df_emisiones["Country"].dropna().unique()
+            country_chart = st.selectbox("Select country for chart:", sorted(countries_chart), key="chart_country")
+            df_chart = df_chart[df_chart["Country"] == country_chart]
+        else:  # X-axis = Country
+            region_chart = st.selectbox("Select region for country comparison:", list(regions.keys()), key="chart_region")
+            df_chart = df_chart[df_chart["Country"].isin(regions[region_chart])]
+    elif mode_chart == "Region":
+        region_chart = st.selectbox("Select region for chart:", list(regions.keys()), key="chart_region")
+        df_chart = df_chart[df_chart["Country"].isin(regions[region_chart])]
 
-        if source == "All":
-            df_region = df_region.groupby(["Year"], as_index=False)["Emissions (Mt)"].sum()
-            df_region["Source"] = "All"
-        else:
-            df_region = df_region[df_region["Source"] == source]
-            df_region = df_region.groupby(["Year"], as_index=False)["Emissions (Mt)"].sum()
-            df_region["Source"] = source
+    # Group data for chart
+    if x_axis == "Year":
+        df_chart_grouped = df_chart.groupby(["Year", "Source"], as_index=False)["Emissions (Mt)"].sum()
+    else:
+        df_chart_grouped = df_chart.groupby(["Country", "Source"], as_index=False)["Emissions (Mt)"].sum()
+        x_axis = "Country"
 
-        df_region = df_region[["Source", "Year", "Emissions (Mt)"]]
-        df_region["Year"] = df_region["Year"].astype(int)
+    # Color map
+    color_map = {
+        "Coal": "crimson",
+        "Oil": "green",
+        "Gas": "gray",
+        "Cement": "skyblue",
+        "Flaring": "darkorange"
+    }
 
-        total_region = df_region["Emissions (Mt)"].sum()
+    # Plot chart
+    if chart_type == "Line Chart":
+        fig = px.line(
+            df_chart_grouped,
+            x=x_axis,
+            y="Emissions (Mt)",
+            color="Source",
+            markers=True,
+            title=f"{chart_type} of Emissions ({', '.join(sources_chart)})",
+            color_discrete_map=color_map
+        )
+    else:
+        fig = px.bar(
+            df_chart_grouped,
+            x=x_axis,
+            y="Emissions (Mt)",
+            color="Source",
+            barmode="group",
+            title=f"{chart_type} of Emissions ({', '.join(sources_chart)})",
+            color_discrete_map=color_map
+        )
 
-        st.subheader(f"Emissions of {region} ({source}) between {years[0]} and {years[1]}")
-        st.dataframe(df_region.style.set_properties(**{'text-align': 'center'}), use_container_width=True)
-        st.metric(label=f"Total emissions of {region} ({source})", value=f"{round(total_region, 2)} Mt CO₂")
+    st.plotly_chart(fig, use_container_width=True)
 
 elif section == "Geological Storage Capacity":
     st.subheader("🛢️ Geological Storage Capacity")
@@ -361,7 +386,6 @@ elif section == "Carbon balance and emission removal":
     df_balance["CO₂ not stored (Mt)"] = df_balance["CO₂ emissions (Mt)"] - df_balance["CO₂ stored (Mt)"]
     df_balance["% Removal"] = (df_balance["CO₂ stored (Mt)"] / df_balance["CO₂ emissions (Mt)"] * 100).round(2)
 
-    # --- Total America ---
     with st.expander("🌎 Total balance - America"):
         df_balance_ext = df_balance.copy()
 
@@ -460,7 +484,6 @@ elif section == "Carbon balance and emission removal":
 
         st.plotly_chart(fig, use_container_width=True)
 
-    # --- North America ---
     with st.expander("🟢 Balance - North America"):
         df_na = df_balance[df_balance["Region"] == "North America"].copy()
 
@@ -516,7 +539,6 @@ elif section == "Carbon balance and emission removal":
 
         st.plotly_chart(fig, use_container_width=True)
 
-    # --- South America ---
     with st.expander("🟢 Balance - South America"):
         df_sa = df_balance[df_balance["Region"] == "South America"].copy()
 
@@ -601,7 +623,6 @@ elif section == "Carbon balance and emission removal":
 
         st.plotly_chart(fig, use_container_width=True)
 
-    # --- Country selector ---
     with st.expander("🌍 Balance - Country"):
         selected_countries = st.multiselect(
             "Select countries:",

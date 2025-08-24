@@ -3,6 +3,7 @@ import pandas as pd
 import streamlit as st
 import folium
 from streamlit_folium import folium_static
+from streamlit_folium import st_folium
 import plotly.express as px
 from pathlib import Path
 from streamlit_option_menu import option_menu
@@ -689,38 +690,127 @@ elif section == "Carbon balance and emission removal":
         st.plotly_chart(fig, use_container_width=True)
 
 elif section == "Reservoirs Location":
+
+    fields_data = [
+        {
+            "name": "Clive Field",
+            "formation": "Leduc Formation",
+            "lat": 52.42931464961698,
+            "lon": -113.41669788869072,
+            "thickness": "180 m",
+            "porosity": "8%",
+            "capacity": "18.38 Mt",
+            "cluster": False  # Este es cluster propuesto
+        },
+        {
+            "name": "Weyburn Field",
+            "formation": "Midale Formation",
+            "lat": 49.66753769,
+            "lon": -103.85824585,
+            "thickness": "20 m",
+            "porosity": "26%",
+            "capacity": "125.13 Mt",
+            "cluster": False
+        },
+        {
+            "name": "Chigwell Field",
+            "formation": "Viking Formation",
+            "lat": 52.632,
+            "lon": -113.581,
+            "thickness": "30 m",
+            "porosity": "13%",
+            "capacity": "9.33 Mt",
+            "cluster": False
+        },
+        {
+            "name": "Redwater Field",
+            "formation": "Leduc Formation",
+            "lat": 53.953056,
+            "lon": -113.110794,
+            "thickness": "250 m",
+            "porosity": "12%",
+            "capacity": "79.33 Mt",
+            "cluster": False
+        },
+        {
+            "name": "Joffre Field",
+            "formation": "Viking Formation",
+            "lat": 52.336111,
+            "lon": -113.537222,
+            "thickness": "20 m",
+            "porosity": "13%",
+            "capacity": "35.35 Mt",
+            "cluster": True
+        }
+    ]
+    # --- Crear mapa ---
+    m = folium.Map(location=[10, -60], zoom_start=3)
+
+    # --- Agregar marcadores ---
+    for field in fields_data:
+        # Texto con formato HTML (nombre en negrita + propiedades)
+        tooltip_html = f"""
+        <b>{field['name']}</b><br>
+        Formación: {field['formation']}<br>
+        Espesor: {field['thickness']}<br>
+        Porosidad: {field['porosity']}<br>
+        Capacidad: {field['capacity']}
+        """
+
+        if field["cluster"]:
+            # Marcador especial para los clusters propuestos
+            folium.Marker(
+                location=[field["lat"], field["lon"]],
+                popup=tooltip_html,
+                tooltip=tooltip_html,
+                icon=folium.Icon(color="red", icon="star", prefix="fa")
+            ).add_to(m)
+        else:
+            # Marcadores normales
+            folium.Marker(
+                location=[field["lat"], field["lon"]],
+                popup=tooltip_html,
+                tooltip=tooltip_html,
+                icon=folium.Icon(color="blue", icon="circle", prefix="fa")
+            ).add_to(m)
+
+    # --- Mostrar en Streamlit ---
+    st.subheader("🛢 Geological Storage Reservoirs")
+    st_data = st_folium(m, width=800, height=500)
+
+
     # Load the coordinates of the countries where the EOR projects of this dataset are
-    coordinates = {
-        "Clive": ([52.42931464961698, -113.41669788869072], 5),
-        "Weyburn": ([49.66753769, -103.85824585], 38),
-        "Chigwell": ([52.632, -113.581], 140),
-        "Redwater": ([53.953056, -113.110794], 8),
-        "Joffre": ([52.336111, -113.537222], 1),
-        "Pembina": ([53.062, -114.891], 1),
-        "Quest": ([53.797248, -113.092769], 10),
-        "Aquistore": ([49.096207, -103.033997], 1),
-        "West Ranch": ([28.808333, -96.615667], 1),
-        "Rangely": ([40.1044, -108.8424], 1),
-        "Bell Creek": ([45.10927, -105.08509], 1),
-        "Farnsworth": ([36.2796667, -101.0666174], 1),
-        "Cranfield": ([31.5440558, -91.2059417], 1),
-        "Illinois": ([40.0796606, -89.4337288], 1),
-        "Citronelle": ([31.0907338, -88.2280622], 1),
-        "Cahuasas Fm": ([21.150, -98.850], 1),
-        "Tamaulipas Fm": ([24.283, -98.567], 1),
-        "Búzios": ([-24.657, -42.498], 1),
-        "Lula": ([-25.607186, -42.648926], 1),
-        "Guajira Basin": ([11.97790, -71.42234], 1),
-        "Sinú Basin": ([8.748, -75.881], 1),
-        "Sacha": ([-0.3233, -76.8644], 1),
-        "Lago Agrio": ([0.1069, -76.872], 1),
-        "Yanaquincha Este": ([-0.37979, -76.81499], 1)
-    }
+    #coordinates = {
+    #    "Clive": ([52.42931464961698, -113.41669788869072], 5),
+    #    "Weyburn": ([49.66753769, -103.85824585], 38),
+    #    "Chigwell": ([52.632, -113.581], 140),
+    #    "Redwater": ([53.953056, -113.110794], 8),
+    #    "Joffre": ([52.336111, -113.537222], 1),
+    #    "Pembina": ([53.062, -114.891], 1),
+    #    "Quest": ([53.797248, -113.092769], 10),
+    #   "Aquistore": ([49.096207, -103.033997], 1),
+    #    "West Ranch": ([28.808333, -96.615667], 1),
+    #    "Rangely": ([40.1044, -108.8424], 1),
+    #    "Bell Creek": ([45.10927, -105.08509], 1),
+    #    "Farnsworth": ([36.2796667, -101.0666174], 1),
+    #    "Cranfield": ([31.5440558, -91.2059417], 1),
+    #    "Illinois": ([40.0796606, -89.4337288], 1),
+    #    "Citronelle": ([31.0907338, -88.2280622], 1),
+    #    "Cahuasas Fm": ([21.150, -98.850], 1),
+    #    "Tamaulipas Fm": ([24.283, -98.567], 1),
+    #    "Búzios": ([-24.657, -42.498], 1),
+    #    "Lula": ([-25.607186, -42.648926], 1),
+    #   "Guajira Basin": ([11.97790, -71.42234], 1),
+    #    "Sinú Basin": ([8.748, -75.881], 1),
+    #    "Sacha": ([-0.3233, -76.8644], 1),
+    #    "Lago Agrio": ([0.1069, -76.872], 1),
+    #    "Yanaquincha Este": ([-0.37979, -76.81499], 1)
+    #}
     # Load the world map
-    m = folium.Map(zoom_start=14)
+    #m = folium.Map(zoom_start=14)
     # Load the markers and popups
-    for reservoir, point in coordinates.items():
-        folium.Marker(
-            point[0], popup="<b>{}: </b> {} EOR Projects".format(reservoir, point[1])
-        ).add_to(m)
-    folium_static(m)
+    #for reservoir, point in coordinates.items():
+    #    folium.Marker(
+    #        point[0], popup="<b>{}: </b> {} EOR Projects".format(reservoir, point[1])
+    #    ).add_to(m)
+    #folium_static(m)

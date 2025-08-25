@@ -10,8 +10,11 @@ from streamlit_option_menu import option_menu
 import plotly.graph_objects as go
 #from PIL import Image
 
-st.set_page_config(page_title="CCS America", page_icon="sources/icons/logo.png", layout="wide")
-logo = "sources/icons/logo.png"
+st.set_page_config(
+    page_title="CCS America",
+    page_icon="Sources/Icons/Logo.png",
+    layout="wide"
+)
 
 st.markdown(
     """
@@ -690,9 +693,15 @@ elif section == "Carbon balance and emission removal":
         st.plotly_chart(fig, use_container_width=True)
 
 elif section == "Reservoirs Location":
+    st.subheader("🛢️ Geological Storage Reservoirs")
+    st.markdown("""
+            Explore the main **geological storage reservoirs** across the Americas. 
+            Click on each marker to see details about the formation, thickness, porosity, and storage capacity.
+        """)
 
     fields_data = [
         {
+            "country": "Canada",
             "name": "Clive Field",
             "formation": "Leduc Formation",
             "lat": 52.42931464961698,
@@ -703,6 +712,7 @@ elif section == "Reservoirs Location":
             "cluster": False
         },
         {
+            "country": "Canada",
             "name": "Weyburn Field",
             "formation": "Midale Formation",
             "lat": 49.66753769,
@@ -713,6 +723,7 @@ elif section == "Reservoirs Location":
             "cluster": False
         },
         {
+            "country": "Canada",
             "name": "Chigwell Field",
             "formation": "Viking Formation",
             "lat": 52.632,
@@ -723,6 +734,7 @@ elif section == "Reservoirs Location":
             "cluster": False
         },
         {
+            "country": "Canada",
             "name": "Redwater Field",
             "formation": "Leduc Formation",
             "lat": 53.953056,
@@ -733,6 +745,7 @@ elif section == "Reservoirs Location":
             "cluster": False
         },
         {
+            "country": "Canada",
             "name": "Joffre Field",
             "formation": "Viking Formation",
             "lat": 52.336111,
@@ -753,6 +766,7 @@ elif section == "Reservoirs Location":
             "cluster": False
         },
         {
+            "country": "Canada",
             "name": "Quest",
             "formation": "Basal Cambrian Sand",
             "lat": 53.797248,
@@ -763,6 +777,7 @@ elif section == "Reservoirs Location":
             "cluster": False
         },
         {
+            "country": "Canada",
             "name": "Aquistore",
             "formation": "Deadwood Formation",
             "lat": 49.096207,
@@ -773,6 +788,7 @@ elif section == "Reservoirs Location":
             "cluster": False
         },
         {
+            "country": "United States",
             "name": "West Ranch Field",
             "formation": "Frio Formation",
             "lat": 28.808333,
@@ -783,6 +799,7 @@ elif section == "Reservoirs Location":
             "cluster": False
         },
         {
+            "country": "United States",
             "name": "Rangely Field",
             "formation": "Weber Sandstone",
             "lat": 40.1044,
@@ -793,6 +810,7 @@ elif section == "Reservoirs Location":
             "cluster": False
         },
         {
+            "country": "United States",
             "name": "Bell Creek Field",
             "formation": "Muddy Formation",
             "lat": 45.10927,
@@ -803,6 +821,7 @@ elif section == "Reservoirs Location":
             "cluster": False
         },
         {
+            "country": "United States",
             "name": "Farnsworth Field",
             "formation": "Morrow Formation",
             "lat": 36.2796667,
@@ -813,6 +832,7 @@ elif section == "Reservoirs Location":
             "cluster": False
         },
         {
+            "country": "United States",
             "name": "Illinois Basin",
             "formation": "Mt. Simon Sandstone",
             "lat": 40.0796606,
@@ -823,6 +843,7 @@ elif section == "Reservoirs Location":
             "cluster": False
         },
         {
+            "country": "United States",
             "name": "Cranfield Field",
             "formation": "Tuscaloosa Formation",
             "lat": 31.5440558,
@@ -833,6 +854,7 @@ elif section == "Reservoirs Location":
             "cluster": False
         },
         {
+            "country": "United States",
             "name": "Citronelle Field",
             "formation": "Paluxy Formation",
             "lat": 31.0907338,
@@ -840,9 +862,11 @@ elif section == "Reservoirs Location":
             "thickness": "143 m",
             "porosity": "25%",
             "capacity": "753.19 Mt",
-            "cluster": True
+            "cluster": True,
+            "cluster_type": "USA"
         },
         {
+            "country": "Mexico",
             "name": "Tampico-Misantla Basin",
             "formation": "Cahuasas Formation",
             "lat": 21.150,
@@ -853,6 +877,7 @@ elif section == "Reservoirs Location":
             "cluster": False
         },
         {
+            "country": "Mexico",
             "name": "Tampico-Misantla Basin",
             "formation": "Tamaulipas Formation",
             "lat": 24.283,
@@ -863,6 +888,7 @@ elif section == "Reservoirs Location":
             "cluster": False
         },
         {
+            "country": "Brazil",
             "name": "Búzios Field",
             "formation": "Itapema Formation",
             "lat": -24.657,
@@ -873,6 +899,7 @@ elif section == "Reservoirs Location":
             "cluster": False
         },
         {
+            "country": "Brazil",
             "name": "Búzios Field",
             "formation": "Barra Velha Formation",
             "lat": -24.657,
@@ -883,6 +910,7 @@ elif section == "Reservoirs Location":
             "cluster": False
         },
         {
+            "country": "Brazil",
             "name": "Tupi Field",
             "formation": "Itapema Formation",
             "lat": -25.607186,
@@ -890,9 +918,11 @@ elif section == "Reservoirs Location":
             "thickness": "121.92 m",
             "porosity": "13%",
             "capacity": "940.03 Mt",
-            "cluster": True
+            "cluster": True,
+            "cluster_type": "Brazil"
         },
         {
+            "country": "Colombia",
             "name": "Guajira Basin",
             "formation": "Jimol Formation",
             "lat": 11.97790,
@@ -903,6 +933,7 @@ elif section == "Reservoirs Location":
             "cluster": False
         },
         {
+            "country": "Colombia",
             "name": "Guajira Basin",
             "formation": "Siamana Formation",
             "lat": 11.97790,
@@ -910,9 +941,11 @@ elif section == "Reservoirs Location":
             "thickness": "12 m",
             "porosity": "17.5%",
             "capacity": "682.73 Mt",
-            "cluster": True
+            "cluster": True,
+            "cluster_type": "Colombia"
         },
         {
+            "country": "Colombia",
             "name": "Sinú Basin",
             "formation": "Jimol Formation",
             "lat": 8.748,
@@ -923,6 +956,7 @@ elif section == "Reservoirs Location":
             "cluster": False
         },
         {
+            "country": "Ecuador",
             "name": "Sacha Field",
             "formation": "Hollín Superior Formation",
             "lat": -0.3233,
@@ -933,6 +967,7 @@ elif section == "Reservoirs Location":
             "cluster": False
         },
         {
+            "country": "Ecuador",
             "name": "Lago Agrio Field",
             "formation": "Hollín Superior Formation",
             "lat": 0.1069,
@@ -943,6 +978,7 @@ elif section == "Reservoirs Location":
             "cluster": False
         },
         {
+            "country": "Ecuador",
             "name": "Parahuacu Field",
             "formation": "U Inferior Formation",
             "lat": 0.1069,
@@ -953,6 +989,7 @@ elif section == "Reservoirs Location":
             "cluster": False
         },
         {
+            "country": "Ecuador",
             "name": "Sacha Field",
             "formation": "Napo T Formation",
             "lat": -0.3233,
@@ -963,6 +1000,7 @@ elif section == "Reservoirs Location":
             "cluster": False
         },
         {
+            "country": "Ecuador",
             "name": "Yanaquincha Este Field",
             "formation": "T Principal Formation",
             "lat": -0.37979,
@@ -973,38 +1011,64 @@ elif section == "Reservoirs Location":
             "cluster": False
         }
     ]
-    m = folium.Map(location=[10, -60], zoom_start=3)
 
-    for i, field in enumerate(fields_data):
+    country_center = {
+        "Canada": [56.1304, -106.3468],
+        "United States": [37.0902, -95.7129],
+        "Mexico": [23.6345, -102.5528],
+        "Brazil": [-14.235004, -51.92528],
+        "Colombia": [4.5709, -74.2973],
+        "Ecuador": [-1.8312, -78.1834]
+    }
+
+    # Country selection dropdown
+    options = ["America"] + sorted(set(f["country"] for f in fields_data if "country" in f))
+    selected = st.selectbox("🌎 Select map view:", options)
+
+    # Filter data and set map center/zoom
+    if selected == "America":
+        filtered_data = fields_data
+        map_center = [10, -60]
+        zoom_level = 2
+    else:
+        filtered_data = [f for f in fields_data if f.get("country") == selected]
+        map_center = country_center.get(selected, [10, -60])
+        zoom_level = 4
+
+    # Create map
+    m = folium.Map(location=map_center, zoom_start=zoom_level)
+
+    for i, field in enumerate(filtered_data):
         lat_jitter = field["lat"] + (i % 3) * 0.005
         lon_jitter = field["lon"] + (i % 3) * 0.005
 
         tooltip_html = f"""
-        <b>{field['name']}</b><br>
-        Formación: {field['formation']}<br>
-        Espesor: {field['thickness']}<br>
-        Porosidad: {field['porosity']}<br>
-        Capacidad: {field['capacity']}
-        """
+            <b>{field['name']}</b><br>
+            Formation: {field['formation']}<br>
+            Thickness: {field['thickness']}<br>
+            Porosity: {field['porosity']}<br>
+            Capacity: {field['capacity']}
+            """
 
-        if field["cluster"]:
-            folium.Marker(
-                location=[lat_jitter, lon_jitter],
-                popup=tooltip_html,
-                tooltip=tooltip_html,
-                icon=folium.Icon(color="red", icon="star", prefix="fa")
-            ).add_to(m)
+        if field.get("cluster"):
+            cluster_type = field.get("cluster_type", "")
+            if cluster_type in ["USA", "Colombia"]:
+                icon = folium.CustomIcon("Sources/Icons/Aquifer.png", icon_size=(40, 40))
+            elif cluster_type == "Brazil":
+                icon = folium.CustomIcon("Sources/Icons/Reservoir.png", icon_size=(40, 40))
+            else:
+                icon = folium.Icon(color="red", icon="star", prefix="fa")  # fallback
         else:
-            folium.Marker(
-                location=[lat_jitter, lon_jitter],
-                popup=tooltip_html,
-                tooltip=tooltip_html,
-                icon=folium.Icon(color="blue", icon="circle", prefix="fa")
-            ).add_to(m)
+            icon = folium.Icon(color="blue", icon="circle", prefix="fa")
 
-    st.subheader("Geological Storage Reservoirs")
+        folium.Marker(
+            location=[lat_jitter, lon_jitter],
+            popup=tooltip_html,
+            tooltip=tooltip_html,
+            icon=icon
+        ).add_to(m)
+
     st_data = st_folium(m, width=800, height=500)
-
 
     # Load the coordinates of the countries where the EOR projects of this dataset are
     #coordinates = {

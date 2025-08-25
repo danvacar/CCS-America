@@ -700,7 +700,7 @@ elif section == "Reservoirs Location":
             "thickness": "180 m",
             "porosity": "8%",
             "capacity": "18.38 Mt",
-            "cluster": False  # Este es cluster propuesto
+            "cluster": False
         },
         {
             "name": "Weyburn Field",
@@ -740,15 +740,245 @@ elif section == "Reservoirs Location":
             "thickness": "20 m",
             "porosity": "13%",
             "capacity": "35.35 Mt",
+            "cluster": False
+        },
+        {
+            "name": "Pembina Field",
+            "formation": "Cardium Formation",
+            "lat": 53.062,
+            "lon": -114.891,
+            "thickness": "32 m",
+            "porosity": "16.4%",
+            "capacity": "861.54 Mt",
+            "cluster": False
+        },
+        {
+            "name": "Quest",
+            "formation": "Basal Cambrian Sand",
+            "lat": 53.797248,
+            "lon": -113.092769,
+            "thickness": "47 m",
+            "porosity": "17%",
+            "capacity": "65.05 Mt",
+            "cluster": False
+        },
+        {
+            "name": "Aquistore",
+            "formation": "Deadwood Formation",
+            "lat": 49.096207,
+            "lon": -103.033997,
+            "thickness": "38.6 m",
+            "porosity": "15%",
+            "capacity": "67.06 Mt",
+            "cluster": False
+        },
+        {
+            "name": "West Ranch Field",
+            "formation": "Frio Formation",
+            "lat": 28.808333,
+            "lon": -96.615667,
+            "thickness": "27 m",
+            "porosity": "30%",
+            "capacity": "47.79 Mt",
+            "cluster": False
+        },
+        {
+            "name": "Rangely Field",
+            "formation": "Weber Sandstone",
+            "lat": 40.1044,
+            "lon": -108.8424,
+            "thickness": "58 m",
+            "porosity": "58%",
+            "capacity": "95.45 Mt",
+            "cluster": False
+        },
+        {
+            "name": "Bell Creek Field",
+            "formation": "Muddy Formation",
+            "lat": 45.10927,
+            "lon": -105.08509,
+            "thickness": "8 m",
+            "porosity": "25%",
+            "capacity": "13.0 Mt",
+            "cluster": False
+        },
+        {
+            "name": "Farnsworth Field",
+            "formation": "Morrow Formation",
+            "lat": 36.2796667,
+            "lon": -101.0666174,
+            "thickness": "25 m",
+            "porosity": "23%",
+            "capacity": "28.1 Mt",
+            "cluster": False
+        },
+        {
+            "name": "Illinois Basin",
+            "formation": "Mt. Simon Sandstone",
+            "lat": 40.0796606,
+            "lon": -89.4337288,
+            "thickness": "28 m",
+            "porosity": "25.5%",
+            "capacity": "393.15 Mt",
+            "cluster": False
+        },
+        {
+            "name": "Cranfield Field",
+            "formation": "Tuscaloosa Formation",
+            "lat": 31.5440558,
+            "lon": -91.2059417,
+            "thickness": "156 m",
+            "porosity": "21%",
+            "capacity": "109.52 Mt",
+            "cluster": False
+        },
+        {
+            "name": "Citronelle Field",
+            "formation": "Paluxy Formation",
+            "lat": 31.0907338,
+            "lon": -88.2280622,
+            "thickness": "143 m",
+            "porosity": "25%",
+            "capacity": "753.19 Mt",
             "cluster": True
+        },
+        {
+            "name": "Tampico-Misantla Basin",
+            "formation": "Cahuasas Formation",
+            "lat": 21.150,
+            "lon": -98.850,
+            "thickness": "400 m",
+            "porosity": "14%",
+            "capacity": "823.39 Mt",
+            "cluster": False
+        },
+        {
+            "name": "Tampico-Misantla Basin",
+            "formation": "Tamaulipas Formation",
+            "lat": 24.283,
+            "lon": -98.567,
+            "thickness": "154 m",
+            "porosity": "9%",
+            "capacity": "275.49 Mt",
+            "cluster": False
+        },
+        {
+            "name": "Búzios Field",
+            "formation": "Itapema Formation",
+            "lat": -24.657,
+            "lon": -42.498,
+            "thickness": "121.92 m",
+            "porosity": "13%",
+            "capacity": "814.48 Mt",
+            "cluster": False
+        },
+        {
+            "name": "Búzios Field",
+            "formation": "Barra Velha Formation",
+            "lat": -24.657,
+            "lon": -42.498,
+            "thickness": "151 m",
+            "porosity": "11.5%",
+            "capacity": "892.36 Mt",
+            "cluster": False
+        },
+        {
+            "name": "Tupi Field",
+            "formation": "Itapema Formation",
+            "lat": -25.607186,
+            "lon": -42.648926,
+            "thickness": "121.92 m",
+            "porosity": "13%",
+            "capacity": "940.03 Mt",
+            "cluster": True
+        },
+        {
+            "name": "Guajira Basin",
+            "formation": "Jimol Formation",
+            "lat": 11.97790,
+            "lon": -71.42234,
+            "thickness": "37 m",
+            "porosity": "21%",
+            "capacity": "359.42 Mt",
+            "cluster": False
+        },
+        {
+            "name": "Guajira Basin",
+            "formation": "Siamana Formation",
+            "lat": 11.97790,
+            "lon": -71.42234,
+            "thickness": "12 m",
+            "porosity": "17.5%",
+            "capacity": "682.73 Mt",
+            "cluster": True
+        },
+        {
+            "name": "Sinú Basin",
+            "formation": "Jimol Formation",
+            "lat": 8.748,
+            "lon": -75.881,
+            "thickness": "11 m",
+            "porosity": "24%",
+            "capacity": "136.45 Mt",
+            "cluster": False
+        },
+        {
+            "name": "Sacha Field",
+            "formation": "Hollín Superior Formation",
+            "lat": -0.3233,
+            "lon": -76.8644,
+            "thickness": "15.24 m",
+            "porosity": "14%",
+            "capacity": "58.73 Mt",
+            "cluster": False
+        },
+        {
+            "name": "Lago Agrio Field",
+            "formation": "Hollín Superior Formation",
+            "lat": 0.1069,
+            "lon": -76.872,
+            "thickness": "5.48 m",
+            "porosity": "13%",
+            "capacity": "3.63 Mt",
+            "cluster": False
+        },
+        {
+            "name": "Parahuacu Field",
+            "formation": "U Inferior Formation",
+            "lat": 0.1069,
+            "lon": -76.872,
+            "thickness": "12.92 m",
+            "porosity": "11.9%",
+            "capacity": "2.56 Mt",
+            "cluster": False
+        },
+        {
+            "name": "Sacha Field",
+            "formation": "Napo T Formation",
+            "lat": -0.3233,
+            "lon": -76.8644,
+            "thickness": "10.21 m",
+            "porosity": "16%",
+            "capacity": "17.35 Mt",
+            "cluster": False
+        },
+        {
+            "name": "Yanaquincha Este Field",
+            "formation": "T Principal Formation",
+            "lat": -0.37979,
+            "lon": -76.81499,
+            "thickness": "27.74 m",
+            "porosity": "15%",
+            "capacity": "5.41 Mt",
+            "cluster": False
         }
     ]
-    # --- Crear mapa ---
     m = folium.Map(location=[10, -60], zoom_start=3)
 
-    # --- Agregar marcadores ---
-    for field in fields_data:
-        # Texto con formato HTML (nombre en negrita + propiedades)
+    for i, field in enumerate(fields_data):
+        lat_jitter = field["lat"] + (i % 3) * 0.005
+        lon_jitter = field["lon"] + (i % 3) * 0.005
+
         tooltip_html = f"""
         <b>{field['name']}</b><br>
         Formación: {field['formation']}<br>
@@ -758,24 +988,21 @@ elif section == "Reservoirs Location":
         """
 
         if field["cluster"]:
-            # Marcador especial para los clusters propuestos
             folium.Marker(
-                location=[field["lat"], field["lon"]],
+                location=[lat_jitter, lon_jitter],
                 popup=tooltip_html,
                 tooltip=tooltip_html,
                 icon=folium.Icon(color="red", icon="star", prefix="fa")
             ).add_to(m)
         else:
-            # Marcadores normales
             folium.Marker(
-                location=[field["lat"], field["lon"]],
+                location=[lat_jitter, lon_jitter],
                 popup=tooltip_html,
                 tooltip=tooltip_html,
                 icon=folium.Icon(color="blue", icon="circle", prefix="fa")
             ).add_to(m)
 
-    # --- Mostrar en Streamlit ---
-    st.subheader("🛢 Geological Storage Reservoirs")
+    st.subheader("Geological Storage Reservoirs")
     st_data = st_folium(m, width=800, height=500)
 
 

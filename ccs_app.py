@@ -1070,6 +1070,8 @@ elif section == "Reservoirs Location":
 
     st_data = st_folium(m, width=800, height=500)
 
+
+
     # Load the coordinates of the countries where the EOR projects of this dataset are
     #coordinates = {
     #    "Clive": ([52.42931464961698, -113.41669788869072], 5),

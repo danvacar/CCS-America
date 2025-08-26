@@ -37,20 +37,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# CSS codes to improve the design of the web app
-st.markdown(
-    """
-<style>
-h1 {text-align: center;
-}
-body {background-color: #DCE3D5;
-      width: 1400px;
-      margin: 15px auto;
-}
-</style>""",
-    unsafe_allow_html=True,
-)
-
 # Add sections of the app
 with st.sidebar:
      section = option_menu(menu_title="Section Menu", options=["Home",
@@ -756,6 +742,7 @@ elif section == "Reservoirs Location":
             "cluster": False
         },
         {
+            "country": "Canada",
             "name": "Pembina Field",
             "formation": "Cardium Formation",
             "lat": 53.062,

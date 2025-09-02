@@ -39,8 +39,7 @@ st.markdown(
 
 # Add sections of the app
 with st.sidebar:
-     section = option_menu(menu_title="Section Menu", options=[
-                                                               "CO₂ Emissions Volume",
+     section = option_menu(menu_title="Section Menu", options=["CO₂ Emissions Volume",
                                                                "Geological Storage Capacity",
                                                                "Carbon balance and emission removal",
                                                                "Reservoirs Location"],

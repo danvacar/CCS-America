@@ -679,7 +679,7 @@ elif section == "Carbon balance and emission removal":
         st.plotly_chart(fig, use_container_width=True)
 
 elif section == "Reservoirs Location":
-    st.subheader("🛢️ Geological Storage Reservoirs")
+    st.subheader("📍 Reservoirs Location")
     st.markdown("""
             Explore the main **geological storage reservoirs** across the Americas. 
             Click on each marker to see details about the formation, thickness, porosity, and storage capacity.
